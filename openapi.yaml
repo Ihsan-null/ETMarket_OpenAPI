@@ -1,0 +1,2303 @@
+ 
+openapi: 3.0.3
+info:
+  title: E-T Market API
+  description: OPEN API for E-T Market Project
+  version: '1'
+  contact:
+    name: E-T Market Dev
+    email: etmarket@business.co.id
+    url: etmarket.com
+externalDocs:
+  description: Website e-t market
+  url: https://etmarket.com
+servers:
+  - description: E-T Market API Server
+    url: https://{environment}.etmarket.com/api/v1/
+    variables:
+      environment:
+        default: dev
+        enum:
+          - dev
+paths:
+  /markets:
+    get:
+      tags:
+        - Market
+      summary: Get all list of markets
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: Success get all markets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayMarketList'
+              examples:
+                success:
+                  description: Example success get all todo list
+                  value:
+                    - id: 1
+                      name: Pasar malam
+                      address: Bandung
+                    - id: 2
+                      name: Pasar Edan
+                      address: Bekasi
+  /markets/{market_name}:
+    get:
+      tags:
+        - Market
+      summary: Get list market
+      description: Get market with certain name of market
+      parameters:
+        - $ref: '#/components/parameters/MarketName'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayMarketList'
+              examples:
+                pasar:
+                  description: Success get market by string
+                  value:
+                    - id: 1
+                      name: Pasar Malam
+                      address: bandung
+                    - id: 2
+                      name: Pasar Edan
+                      address: Bekasi
+                edan:
+                  description: Success get market by string
+                  value:
+                    - id: 2
+                      name: Pasar Edan
+                      address: Bekasi
+        '404':
+          description: Market not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                pasar wadidaw:
+                  description: Failed to get list market
+                  value:
+                    message: Market not found
+  /categories:
+    get:
+      tags:
+        - Category
+      summary: Get all list of category
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: Success get all category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayCategoryList'
+              examples:
+                success:
+                  description: Example success get all category
+                  value:
+                    - id: 1
+                      name: sayur
+                    - id: 2
+                      name: Buah-buahan
+  /payments:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Payment Method
+      summary: Get all payment method
+      description: Get all payment method for payment
+      parameters: []
+      responses:
+        '200':
+          description: Success get all payment method
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+              examples:
+                success:
+                  description: Example success get payment method
+                  value:
+                    - id: 2
+                      name: COD
+  /markets/{market_id}/seller:
+    get:
+      tags:
+        - Market
+      summary: Get list of seller inside a market
+      description: Get list of seller inside a market
+      parameters:
+        - $ref: '#/components/parameters/MarketId'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: {}
+              examples:
+                Market a:
+                  description: Success get list category or seller by id of market
+                  value:
+                    - id: 1
+                      name: Toko mas Ujang
+                      category: sayur-sayuran
+                      market_id: 1
+                    - id: 2
+                      name: Toko mas Bayu
+                      category: daging
+                      market_id: 1
+        '404':
+          description: Market not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                'id : 999':
+                  description: Failed to get list category or seller from market
+                  value:
+                    message: Market not found
+  /markets/{market_id}/seller/{category_name}:
+    get:
+      tags:
+        - Market
+      summary: Get list seller by search
+      description: Get list seller by searching category name
+      parameters:
+        - in: path
+          name: market_id
+          required: true
+          description: Id market
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample customer id
+              value: '1'
+            '2':
+              description: sample customer id
+              value: '2'
+        - $ref: '#/components/parameters/CategoryList'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: {}
+              examples:
+                sayur:
+                  description: Success get list category or seller by string
+                  value:
+                    - id: 1
+                      name: Toko mas Ujang
+                      category: sayur-sayuran
+                daging:
+                  description: Success get market by string
+                  value:
+                    - id: 2
+                      name: Toko mas Bayu
+                      category: daging
+        '404':
+          description: category not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                makanan kucing:
+                  description: failed to get list of seller
+                  value:
+                    message: seller not found
+  /customer/register:
+    post:
+      tags:
+        - Customer
+      summary: Register for customer
+      description: Create new customer
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+            examples:
+              User1:
+                description: Example User1 register
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success Register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterSuccess'
+              examples:
+                User1:
+                  description: Register Success
+                  value:
+                    id: '1'
+                    email: tono@123
+                    name: Tono
+  /customer/login:
+    post:
+      tags:
+        - Customer
+      summary: Login for customer
+      description: Login and get JWT Token
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+            examples:
+              User1:
+                description: Example User1 login
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+      responses:
+        '200':
+          description: Success Login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+              examples:
+                User1:
+                  description: Login Success
+                  value:
+                    id: '1'
+                    email: tono@123
+                    token: asdad53sdq&nw3dinr
+  /customer/{customer_id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Customer
+      summary: Get detail customer by id
+      description: Get detail user for customer profile
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          description: Id customer for get detail customer
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample customer id
+              value: '1'
+            '2':
+              description: sample customer id
+              value: '2'
+      responses:
+        '200':
+          description: Success get detail customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailUserList'
+              examples:
+                success:
+                  description: Example success get detail customer
+                  value:
+                    id: 1
+                    email: dewi@gmail.com
+                    name: Dewi
+                    address: Jl. QQQQ no 292, Bogor
+                    gender: F
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Customer
+      summary: Update detail customer
+      description: Edit profile for customer
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          description: Id customer for update detail customer
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample customer id
+              value: '1'
+            '2':
+              description: sample customer id
+              value: '2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+            examples:
+              User1:
+                description: Example User1 update detail
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success update customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Update Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /customer/history:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Customer
+      summary: Get customer's checkout status in progress
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/History'
+      responses:
+        '200':
+          description: Success get a specific checkout status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checkout'
+              examples:
+                Checkout status in progress:
+                  description: Success get checkout for a specific status
+                  value:
+                    - id: 1
+                      totalQty: 3
+                      totalPrice: 20000
+                      customerId: 1
+                      paymentId: 2
+                      status: delivery
+                    - id: 2
+                      totalQty: 3
+                      totalPrice: 30000
+                      customerId: 1
+                      paymentId: 1
+                      status: delivery
+                    - id: 3
+                      totalQty: 4
+                      totalPrice: 22000
+                      customerId: 1
+                      paymentId: 1
+                      status: delivery
+                Checkout status completed:
+                  description: Success get checkout for a specific status
+                  value:
+                    - id: 1
+                      totalQty: 3
+                      totalPrice: 20000
+                      customerId: 1
+                      paymentId: 1
+                      status: completed
+                    - id: 2
+                      totalQty: 3
+                      totalPrice: 30000
+                      customerId: 1
+                      paymentId: 2
+                      status: completed
+                    - id: 3
+                      totalQty: 4
+                      totalPrice: 22000
+                      customerId: 1
+                      paymentId: 1
+                      status: completed
+        '404':
+          description: Checkout not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                status = stunned:
+                  description: failed to get specific checkout
+                  value:
+                    message: checkout not found
+  /customer/logout/{customer_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Customer
+      summary: Logout
+      description: Logout for customer
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          description: Id customer for logout
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample customer id
+              value: '1'
+            '2':
+              description: sample customer id
+              value: '2'
+      responses:
+        '200':
+          description: Success logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Logout Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /seller/register:
+    post:
+      tags:
+        - Seller
+      summary: Register for seller
+      description: Create new seller
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterSeller'
+            examples:
+              User1:
+                description: Example User1 register
+                value:
+                  market_id: 2
+                  category_id: 2
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success Register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterSuccess'
+              examples:
+                User1:
+                  description: Register Success
+                  value:
+                    id: '1'
+                    email: tono@123
+                    name: Tono
+  /seller/login:
+    post:
+      tags:
+        - Seller
+      summary: Login for seller
+      description: Login and get JWT Token
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+            examples:
+              User1:
+                description: Example User1 login
+                value:
+                  email: bambang@gmail.com
+                  password: bam123
+      responses:
+        '200':
+          description: Success Login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+              examples:
+                User1:
+                  description: Login Success
+                  value:
+                    id: '5'
+                    email: bambang@gmail.com
+                    token: yda567q0d&nw3dinr
+  /seller/{seller_id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Get detail seller by id
+      description: Get detail user for seller profile
+      parameters:
+        - in: path
+          name: seller_id
+          required: true
+          description: Id seller for get detail seller
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample seller id
+              value: '1'
+            '2':
+              description: sample seller id
+              value: '2'
+      responses:
+        '200':
+          description: Success get detail seller
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailUserList'
+              examples:
+                success:
+                  description: Example success get detail seller
+                  value:
+                    id: 1
+                    email: dewi@gmail.com
+                    name: Dewi
+                    address: Jl. QQQQ no 292, Bogor
+                    gender: F
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Update detail seller
+      description: Edit profile for seller
+      parameters:
+        - in: path
+          name: seller_id
+          required: true
+          description: Id seller for get detail seller
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample seller id
+              value: '1'
+            '2':
+              description: sample seller id
+              value: '2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+            examples:
+              User1:
+                description: Example User1 update detail
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success update seller
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Update Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /seller/orderlist:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Get all order list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: Success get all order list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOrderList'
+              examples:
+                success:
+                  description: Example success get all order list
+                  value:
+                    - driver_name: Bambang
+                      product_name: Semangka
+                      qty: 4
+                      price: 40000
+                    - driver_name: Bambang
+                      product_name: Semangka
+                      qty: 4
+                      price: 40000
+  /seller/orderlist/{order_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Update status order
+      description: ''
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          description: Id order for update status order
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample order id
+              value: '1'
+            '2':
+              description: sample order id
+              value: '2'
+      responses:
+        '200':
+          description: Success update status order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStatusSuccess'
+              examples:
+                success:
+                  description: Example success update status order
+                  value:
+                    checkout_id: 1
+                    product_id: 2
+                    qty: 4
+                    price: 40000
+                    status: completed
+  /seller/products:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Get seller products
+      description: ''
+      responses:
+        '200':
+          description: Success get a specific seller product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Seller 1:
+                  description: Success get your products
+                  value:
+                    - id: 1
+                      name: tomat
+                      price: 2000
+                      stock: 50
+                      description: ini tomat
+                      sellerId: 1
+                    - id: 2
+                      name: sawi
+                      price: 3000
+                      stock: 50
+                      description: ini sawi
+                      sellerId: 1
+                    - id: 3
+                      name: tomat hijau
+                      price: 2100
+                      stock: 50
+                      description: ini tomat hijau
+                      sellerId: 1
+                Seller 2:
+                  description: Success get your products
+                  value:
+                    - id: 4
+                      name: jamu kunyit
+                      price: 8000
+                      stock: 50
+                      description: ini jamu kunyit
+                      sellerId: 2
+                    - id: 5
+                      name: jamu kuat
+                      price: 10000
+                      stock: 50
+                      description: ini jamu kuat
+                      sellerId: 2
+                    - id: 6
+                      name: jamu ginseng
+                      price: 21000
+                      stock: 20
+                      description: ini jamu ginseng
+                      sellerId: 2
+        '404':
+          description: Shop or product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '1':
+                  description: failed to get specific product
+                  value:
+                    message: product not found
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Add seller products
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {}
+            examples:
+              Seller 1:
+                description: Example add products from my shop
+                value:
+                  name: tomat
+                  price: 2000
+                  stock: 50
+                  description: ini tomat
+                  sellerId: 1
+              Seller 2:
+                description: Example add products from my shop
+                value:
+                  id: 4
+                  name: jamu kunyit
+                  price: 8000
+                  stock: 50
+                  description: ini jamu kunyit
+                  sellerId: 2
+      responses:
+        '200':
+          description: Success add a specific seller product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Seller 1:
+                  description: Success add your products
+                  value:
+                    - id: 1
+                      name: tomat
+                      price: 2000
+                      stock: 50
+                      description: ini tomat
+                      sellerId: 1
+                Seller 2:
+                  description: Success add your products
+                  value:
+                    - id: 4
+                      name: jamu kunyit
+                      price: 8000
+                      stock: 50
+                      description: ini jamu kunyit
+                      sellerId: 2
+        '404':
+          description: Product cannot be added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '1':
+                  description: failed to add specific product
+                  value:
+                    message: product not found
+  /seller/products/{product_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Edit seller products
+      description: ''
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          description: Id order for update status order
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample order id
+              value: '1'
+            '2':
+              description: sample order id
+              value: '2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {}
+            examples:
+              Seller 1:
+                description: Example add products from my shop
+                value:
+                  name: tomat
+                  price: 2000
+                  stock: 50
+                  description: ini tomat
+                  sellerId: 1
+              Seller 2:
+                description: Example add products from my shop
+                value:
+                  id: 4
+                  name: jamu kunyit
+                  price: 8000
+                  stock: 50
+                  description: ini jamu kunyit
+                  sellerId: 2
+      responses:
+        '200':
+          description: Success add a specific seller product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Seller 1:
+                  description: Success edit your products
+                  value:
+                    - id: 1
+                      name: tomat
+                      price: 2000
+                      stock: 50
+                      description: ini tomat
+                      sellerId: 1
+                Seller 2:
+                  description: Success edit your products
+                  value:
+                    - id: 4
+                      name: jamu kunyit
+                      price: 8000
+                      stock: 50
+                      description: ini jamu kunyit
+                      sellerId: 2
+        '404':
+          description: Product cannot be edited
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '1':
+                  description: failed to edit specific product
+                  value:
+                    message: product not found
+  /seller/logout/{seller_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Seller
+      summary: Logout
+      description: Logout for seller
+      parameters:
+        - in: path
+          name: seller_id
+          required: true
+          description: Id seller for logout
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample seller id
+              value: '1'
+            '2':
+              description: sample seller id
+              value: '2'
+      responses:
+        '200':
+          description: Success logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Logout Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /driver/register:
+    post:
+      tags:
+        - Driver
+      summary: Register for driver
+      description: Create new driver
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+            examples:
+              User1:
+                description: Example User1 register
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success Register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterSuccess'
+              examples:
+                User1:
+                  description: Register Success
+                  value:
+                    id: '1'
+                    email: tono@123
+                    name: Tono
+  /driver/login:
+    post:
+      tags:
+        - Driver
+      summary: Login for driver
+      description: Login and get JWT Token
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+            examples:
+              User1:
+                description: Example User1 login
+                value:
+                  email: kiki@gmail.com
+                  password: kiki822
+      responses:
+        '200':
+          description: Success Login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+              examples:
+                User1:
+                  description: Login Success
+                  value:
+                    id: '3'
+                    email: kiki@gmail.com
+                    token: yda567q0d&nw3dinr
+  /driver/{driver_id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Get detail driver by id
+      description: Get detail driver for driver profile
+      parameters:
+        - in: path
+          name: driver_id
+          required: true
+          description: Id driver for get detail driver
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample driver id
+              value: '1'
+            '2':
+              description: sample driver id
+              value: '2'
+      responses:
+        '200':
+          description: Success get detail driver
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailUserList'
+              examples:
+                success:
+                  description: Example success get detail driver
+                  value:
+                    id: 1
+                    email: dewi@gmail.com
+                    name: Dewi
+                    address: Jl. QQQQ no 292, Bogor
+                    gender: F
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Update detail driver
+      description: Edit profile for driver
+      parameters:
+        - in: path
+          name: driver_id
+          required: true
+          description: Id driver for get detail driver
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample driver id
+              value: '1'
+            '2':
+              description: sample driver id
+              value: '2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+            examples:
+              User1:
+                description: Example User1 update detail
+                value:
+                  email: tono@gmail.com
+                  password: tonobros
+                  name: Tono
+                  address: Jl Medan Merdeka
+                  gender: M
+      responses:
+        '200':
+          description: Success update driver
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Update Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /driver/orderlist:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Get a list of checkouts
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: Success get checkouts with status searching
+          content:
+            application/json:
+              examples:
+                success:
+                  description: Success get checkouts with status searching
+                  value:
+                    - id: 1
+                      total_qty: 2
+                      total_price: 55000
+                      customer_id: 1
+                      payment_id: 1
+                      status: searching
+                      delivery_price: 5000
+        '404':
+          description: failed get checkout
+          content:
+            application/json:
+              examples:
+                'checkout_id : 0':
+                  description: Failed get checkout
+                  value:
+                    message: checkout not found
+  /driver/orderlist/{checkout_id}:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Taking an order(checkout)
+      description: ''
+      parameters:
+        - in: path
+          name: checkout_id
+          required: true
+          description: Id checkout to make a delivery
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            Checkout 1:
+              description: sample checkout id for make delivery based on checkout id
+              value: 1
+            Checkout 2:
+              description: sample checkout id for make delivery based on checkout id
+              value: 2
+      responses:
+        '200':
+          description: Success post make a delivery
+          content:
+            application/json:
+              examples:
+                Checkout 1:
+                  description: Success make a delivery
+                  value:
+                    - status: progress
+                      driver_id: 1
+                      checkout_id: 1
+                Checkout 2:
+                  description: Success make a delivery
+                  value:
+                    - status: progress
+                      driver_id: 1
+                      checkout_id: 2
+        '404':
+          description: failed get checkout
+          content:
+            application/json:
+              examples:
+                'checkout_id : 0':
+                  description: Failed get checkout
+                  value:
+                    message: checkout not found
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Confrim delivery as finished
+      description: ''
+      parameters:
+        - in: path
+          name: checkout_id
+          required: true
+          description: Id checkout to finish a delivery
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            Checkout 1:
+              description: sample checkout id for finish delivery based on checkout id
+              value: 1
+            Checkout 2:
+              description: sample checkout id for finish delivery based on checkout id
+              value: 2
+      responses:
+        '200':
+          description: Success finish a delivery
+          content:
+            application/json:
+              examples:
+                Checkout 1:
+                  description: Success finish a delivery
+                  value:
+                    - status: completed
+                      driver_id: 1
+                      checkout_id: 1
+                Checkout 2:
+                  description: Success finish a delivery
+                  value:
+                    - status: completed
+                      driver_id: 1
+                      checkout_id: 2
+        '404':
+          description: failed put delivery
+          content:
+            application/json:
+              examples:
+                'checkout_id : 3':
+                  description: Failed put delivery
+                  value:
+                    message: delivery with checkout_id 3 not found
+  /driver/history:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Get customer's checkout status in progress
+      description: ''
+      parameters:
+        - name: Status
+          in: query
+          required: true
+          description: History delivery list
+          schema: {}
+          examples:
+            progress:
+              description: delivery status
+              value: progress
+            completed:
+              description: delivery status
+              value: completed
+      responses:
+        '200':
+          description: Success get a specific delivery status
+          content:
+            application/json:
+              schema: {}
+              examples:
+                Delivery status in progress:
+                  description: Success get delivery for a specific status
+                  value:
+                    - driver_id: 1
+                      checkout_id: 2
+                      status: progress
+                Delivery status completed:
+                  description: Success get delivery for a specific status
+                  value:
+                    - driver_id: 1
+                      checkout_id: 1
+                      status: completed
+        '404':
+          description: Delivery not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                status = stunned:
+                  description: failed to get specific delivery
+                  value:
+                    message: delivery not found
+  /driver/orderlist/orders:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Get list of order for driver to deliver
+      description: ''
+      parameters:
+        - name: checkout_id
+          in: query
+          required: true
+          description: checkout_id to check at delivery list
+          schema: {}
+          examples:
+            'checkout_id : 1':
+              value: 1
+      responses:
+        '200':
+          description: Success get list of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOrderList'
+              examples:
+                success:
+                  description: Example success get all order list
+                  value:
+                    - product_id: 1
+                      checkout_id: 1
+                      qty: 1
+                      price: 4000
+                    - product_id: 2
+                      checkout_id: 1
+                      qty: 1
+                      price: 5000
+        '404':
+          description: Orders not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: integer
+              examples:
+                'checkout_id : 0':
+                  description: failed to get orders
+                  value:
+                    message: checkout not found
+  /driver/logout/{driver_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Driver
+      summary: Logout
+      description: Logout for driver
+      parameters:
+        - in: path
+          name: driver_id
+          required: true
+          description: Id driver for logout
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample driver id
+              value: '1'
+            '2':
+              description: sample driver id
+              value: '2'
+      responses:
+        '200':
+          description: Success logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+              examples:
+                User1:
+                  description: Logout Success
+                  value:
+                    id: '1'
+                    email: tono@gmail.com
+                    password: tonobros
+                    name: Tono
+                    address: Jl Medan Merdeka
+                    gender: M
+  /seller/{seller_id}/product/{product_id}:
+    get:
+      tags:
+        - Product
+      summary: Get specific product in selected shop
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+        - in: path
+          name: product_id
+          required: true
+          description: Id product
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample driver id
+              value: '1'
+            '2':
+              description: sample driver id
+              value: '2'
+      responses:
+        '200':
+          description: Success get a specific product from shop id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductShop'
+              examples:
+                Toko Sehat Sejahtera:
+                  description: Success get a product in specific shop
+                  value:
+                    - id: 1
+                      category: Jamu
+                      name: Kunyit telur
+                      price: 4000
+                      quantity: 40
+                      description: ini merupakan jahe kunyit telur
+                Toko Udin:
+                  description: Success get all product in specific shop
+                  value:
+                    - id: 2
+                      category: Teh
+                      name: Teh hijau
+                      price: 4000
+                      quantity: 20
+                      description: ini merupakan teh hijau
+        '404':
+          description: Shop or product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '1':
+                  description: failed to get specific product
+                  value:
+                    message: product not found
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Cart
+      summary: Add Product into cart
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+        - in: path
+          name: product_id
+          required: true
+          description: Id product
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            '1':
+              description: sample product id
+              value: '1'
+            '2':
+              description: sample product id
+              value: '2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {}
+            examples:
+              quantity:
+                description: Insert qty
+                value:
+                  qty: 1
+      responses:
+        '200':
+          description: Success add product into a cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductShop'
+              examples:
+                bawang merah:
+                  description: Success insert a product into a cart
+                  value:
+                    - id: 1
+                      price: 4000
+                      quantity: 1
+                      product_id: 1
+                      seller_id: 1
+                cabe:
+                  description: Success insert a product into a cart
+                  value:
+                    - id: 2
+                      price: 5000
+                      quantity: 1
+                      product_id: 1
+                      seller_id: 1
+        '404':
+          description: Seller or product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                'product_id : 0':
+                  description: failed to get specific product
+                  value:
+                    message: product not found
+  /cart:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Cart
+      summary: Get all products in a cart
+      description: Reviewing chosen products in a cart
+      parameters: []
+      responses:
+        '200':
+          description: Success get all products in a cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsInCartList'
+              examples:
+                success:
+                  description: Example success get all products in a cart
+                  value:
+                    - id: 1
+                      customer_id: 1
+                      product_id: 3
+                      qty: 2
+                      price: 20000
+                    - id: 2
+                      customer_id: 1
+                      product_id: 4
+                      qty: 1
+                      price: 5000
+        '404':
+          description: cart is empty
+          content:
+            application/json:
+              examples:
+                cart is empty:
+                  description: Failed to get product in cart
+                  value:
+                    message: cart is empty
+  /cart/{cart_id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - Cart
+      summary: Delete product in a cart
+      description: Deleting chosen product from a cart
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          description: Id cart for delete chosen products from a cart
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            product in cart 1:
+              description: sample cart id for delete chosen products from a cart
+              value: 1
+            product in cart 2:
+              description: sample cart id for delete chosen products from a cart
+              value: 2
+      responses:
+        '200':
+          description: Success delete chosen product from a cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedProductList'
+              examples:
+                product in cart 1:
+                  description: Success delete chosen product from a cart
+                  value:
+                    id: 1
+                    price: 5000
+                    quantity: 1
+                    product_id: 1
+                    seller_id: 1
+                product in cart 2:
+                  description: Success delete chosen product from a cart
+                  value:
+                    id: 2
+                    price: 4000
+                    quantity: 1
+                    product_id: 2
+                    seller_id: 1
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                failed:
+                  description: Failed delete chosen product from a cart
+                  value:
+                    message: Product not found
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Get all products in selected shop
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+      responses:
+        '200':
+          description: Success get product by shop id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayProductShop'
+              examples:
+                Toko Jajang:
+                  description: Success get all product in specific shop
+                  value:
+                    - id: 1
+                      category: Sayur
+                      name: tomat
+                      price: 2000
+                      quantity: 50
+                      description: ini merupakan tomat
+                    - id: 2
+                      category: sayur
+                      name: sawi
+                      price: 2500
+                      quantity: 40
+                      description: ini merupakan sawi
+                Toko Udin:
+                  description: Success get all product in specific shop
+                  value:
+                    - id: 1
+                      category: Buah
+                      name: apel
+                      price: 10000
+                      quantity: 30
+                      description: ini merupakan apel
+                    - id: 2
+                      category: buah
+                      name: jeruk
+                      price: 8000
+                      quantity: 40
+                      description: ini merupakan apel
+        '404':
+          description: Seller not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                failed:
+                  description: failed to get list of product
+                  value:
+                    message: seller not found
+  /seller/{seller_id}/product:
+    get:
+      tags:
+        - Product
+      summary: Get specific product in selected shop
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+      responses:
+        '200':
+          description: Success get a specific product from shop id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductShop'
+              examples:
+                Toko Sehat Sejahtera:
+                  description: Success get a product in specific shop
+                  value:
+                    - id: 1
+                      category: Jamu
+                      name: Kunyit telur
+                      price: 4000
+                      quantity: 40
+                      description: ini merupakan jahe kunyit telur
+                Toko Udin:
+                  description: Success get all product in specific shop
+                  value:
+                    - id: 2
+                      category: Teh
+                      name: Teh hijau
+                      price: 4000
+                      quantity: 20
+                      description: ini merupakan teh hijau
+        '404':
+          description: Shop or product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '1':
+                  description: failed to get specific product
+                  value:
+                    message: product not found
+  /checkout:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Checkout
+      summary: Make a checkout after filling the cart
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: Success make a checkout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayMarketList'
+              examples:
+                success:
+                  description: Success make a checkout
+                  value:
+                    - id: 1
+                      total_qty: 2
+                      total_price: 55000
+                      customer_id: 1
+                      payment_id: 1
+                      status: searching
+                      delivery_price: 5000
+        '404':
+          description: cart is empty
+          content:
+            application/json:
+              examples:
+                cart is empty:
+                  description: Failed to make Checkout
+                  value:
+                    message: cart is empty
+  /checkout/{checkout_id}:
+    put:
+      security:
+        - JWTAuth: []
+      tags:
+        - Checkout
+      summary: Finish the transaction
+      description: ''
+      parameters:
+        - in: path
+          name: checkout_id
+          required: true
+          description: Id checkout to edit checkout
+          schema:
+            type: integer
+            minLength: 1
+            maxLength: 10
+          examples:
+            Checkout 1:
+              description: sample checkout id to finish a checkout
+              value: 1
+      responses:
+        '200':
+          description: Success edit a checkout
+          content:
+            application/json:
+              examples:
+                success:
+                  description: Success edit a checkout
+                  value:
+                    - id: 1
+                      total_qty: 2
+                      total_price: 55000
+                      customer_id: 1
+                      payment_id: 1
+                      status: completed
+        '404':
+          description: failed edit checkout
+          content:
+            application/json:
+              examples:
+                'checkout_id : 0':
+                  description: Failed to edit checkout
+                  value:
+                    message: checkout not found
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    TodolistAuth:
+      description: Authentication for Todolist RESTful API
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    UserId:
+      name: UserId
+      in: path
+      required: true
+      description: User id for login
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 10
+      examples:
+        Tono:
+          description: sample user id by user tono
+          value: 1
+    MarketName:
+      name: market_name
+      in: path
+      required: true
+      description: string for searching a market
+      schema: {}
+      examples:
+        pasar:
+          description: search market by string 'pasar'
+          value: pasar
+        edan:
+          description: search market by string 'edan'
+          value: edan
+    CategoryList:
+      name: category_name
+      in: path
+      required: true
+      description: string for searching a category or seller
+      schema: {}
+      examples:
+        sayur:
+          description: search category by string 'sayur'
+          value: sayur
+        daging:
+          description: search category by string 'daging'
+          value: daging
+    MarketId:
+      name: market_id
+      in: path
+      required: true
+      description: id for get data from market
+      schema: {}
+      examples:
+        Market a:
+          description: get data from market by id '1'
+          value: '1'
+    ShopId:
+      name: seller_id
+      in: path
+      required: true
+      description: Cart id for get shop details
+      schema:
+        type: object
+      examples:
+        shop a:
+          description: sample todo list id for java
+          value: 1
+        shop b:
+          description: sample todo list id for php
+          value: 2
+    CartId:
+      name: cartId
+      in: path
+      required: true
+      description: Cart id for get
+      schema: {}
+      examples:
+        java:
+          description: sample todo list id for java
+          value: 1
+        php:
+          description: sample todo list id for php
+          value: 2
+    SellerParam:
+      name: Seller ID
+      in: path
+      required: true
+      description: value for seller id
+      schema: {}
+      examples:
+        seller a:
+          description: seller id
+          value: '1'
+    ProductParam:
+      name: Product ID
+      in: path
+      required: true
+      description: value for product id
+      schema: {}
+      examples:
+        bawang merah:
+          description: product id
+          value: '1'
+        cabe:
+          description: product id
+          value: '2'
+    History:
+      name: Status
+      in: query
+      required: true
+      description: History list
+      schema: {}
+      examples:
+        delivery:
+          description: checkout status
+          value: delivery
+        completed:
+          description: checkout status
+          value: completed
+  schemas:
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        gender:
+          type: string
+    RegisterSuccess:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+    RegisterSeller:
+      type: object
+      properties:
+        market_id:
+          type: integer
+        category_id:
+          type: integer
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        gender:
+          type: string
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    LoginSuccess:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        Token:
+          type: string
+    UpdateSuccess:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        gender:
+          type: string
+    MarketList:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+    ArrayCategoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CategoryList'
+    CategoryList:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    ArrayOrderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderList'
+    OrderList:
+      type: object
+      properties:
+        driver_name:
+          type: string
+        product_name:
+          type: string
+        qty:
+          type: integer
+        price:
+          type: integer
+    UpdateStatusSuccess:
+      type: object
+      properties:
+        checkout_id:
+          type: integer
+        product_id:
+          type: integer
+        qty:
+          type: integer
+        price:
+          type: integer
+        status:
+          type: string
+    ArrayMarketList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MarketList'
+    ProductsInCartList:
+      type: object
+      properties:
+        cart:
+          type: object
+          items:
+            $ref: '#/components/schemas/ArrayCartList'
+        seller:
+          type: object
+          items:
+            $ref: '#/components/schemas/ArraySellerInCartList'
+    ArrayCartList:
+      type: object
+      properties:
+        id:
+          type: integer
+        customer_id:
+          type: integer
+        status:
+          type: string
+        total_price:
+          type: integer
+        total_quantity:
+          type: integer
+    ArraySellerInCartList:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category_name:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrayProductsInCartList'
+    ArrayProductsInCartList:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: integer
+        quantity:
+          type: integer
+        description:
+          type: string
+    DetailUserList:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        gender:
+          type: string
+    DeletedProductList:
+      type: object
+      properties:
+        id:
+          type: integer
+        price:
+          type: integer
+        quantity:
+          type: integer
+        product_id:
+          type: integer
+        seller_id:
+          type: integer
+    InprogressCartList:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_shop:
+          type: integer
+        id_product:
+          type: integer
+    ArrayInprogressCartList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InprogressCartList'
+    CompleteCartList:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_shop:
+          type: integer
+        id_product:
+          type: integer
+    ProductShop:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+        quantity:
+          type: integer
+        description:
+          type: string
+    arrayProductShop:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductShop'
+    ArrayCompleteCartList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CompleteCartList'
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        qty:
+          type: integer
+        price:
+          type: integer
+        checkout_id:
+          type: integer
+        product_id:
+          type: integer
+        status:
+          type: string
+    Checkout:
+      type: object
+      properties:
+        id:
+          type: integer
+        totalQty:
+          type: integer
+        totalPrice:
+          type: integer
+        customerId:
+          type: integer
+        paymentId:
+          type: integer
+        status:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        Price:
+          type: integer
+        stock:
+          type: integer
+        Description:
+          type: string
+        sellerId:
+          type: integer
