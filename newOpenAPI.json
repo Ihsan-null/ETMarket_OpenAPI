@@ -2404,7 +2404,10 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {},
+              "schema": {
+                "type": "integer",
+                "minLength": 1
+              },
               "examples": {
                 "quantity": {
                   "description": "Insert qty",
